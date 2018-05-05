@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
 
-        FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
+        FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.switchCameraButton);
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (cameraFacing == CameraKit.Constants.FACING_FRONT){
