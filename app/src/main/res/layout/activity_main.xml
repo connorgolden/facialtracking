@@ -6,27 +6,18 @@
     android:layout_height="match_parent"
     tools:context="me.connorgolden.facialtracking.MainActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="94dp"
-        tools:layout_editor_absoluteY="16dp">
+        android:layout_height="match_parent">
 
-        <FrameLayout
+        <com.wonderkiln.camerakit.CameraView xmlns:camerakit="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/camera"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            camerakit:ckFacing="back" />
 
-            <com.wonderkiln.camerakit.CameraView xmlns:camerakit="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/camera"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                camerakit:ckFacing="back"
-                android:adjustViewBounds="true" />
-
-        </FrameLayout>
-
-    </LinearLayout>
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -41,7 +32,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_camera_black_24dp" />
+        app:srcCompat="@drawable/ic_camera_black_24dp" android:focusable="true"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingActionButton2"
@@ -52,7 +43,7 @@
         android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_switch_camera_black_24dp" />
+        app:srcCompat="@drawable/ic_switch_camera_black_24dp" android:focusable="true"/>
 
 
 </android.support.constraint.ConstraintLayout>
