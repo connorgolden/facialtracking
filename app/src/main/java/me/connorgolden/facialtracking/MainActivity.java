@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 
 import com.google.android.gms.vision.face.FaceDetector;
 import com.wonderkiln.camerakit.CameraKit;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         ButterKnife.bind(this);
 
         cameraView.setMethod(cameraMethod);
@@ -40,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
 
-        FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.switchCameraButton);
-        myFab.setOnClickListener(new View.OnClickListener() {
+        ImageButton switchCamButton = (ImageButton) findViewById(R.id.switchCameraButton);
+        switchCamButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (cameraFacing == CameraKit.Constants.FACING_FRONT){
                     cameraView.setFacing(CameraKit.Constants.FACING_BACK);
@@ -52,12 +55,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        
+        ImageButton settingButton = (ImageButton) findViewById(R.id.settingsButton);
+        settingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchSettings();
+            }
+        });
 
         FloatingActionButton camButton = (FloatingActionButton) findViewById(R.id.takePictureButton);
         camButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchSettings();
+                Log.i("Button", "CameraClick");
             }
         });
 
