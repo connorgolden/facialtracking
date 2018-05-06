@@ -10,6 +10,12 @@ import android.widget.ImageButton;
 
 import com.google.android.gms.vision.face.FaceDetector;
 import com.wonderkiln.camerakit.CameraKit;
+import com.wonderkiln.camerakit.CameraKitError;
+import com.wonderkiln.camerakit.CameraKitEvent;
+import com.wonderkiln.camerakit.CameraKitEventCallback;
+import com.wonderkiln.camerakit.CameraKitEventListener;
+import com.wonderkiln.camerakit.CameraKitImage;
+import com.wonderkiln.camerakit.CameraKitVideo;
 import com.wonderkiln.camerakit.CameraView;
 
 import butterknife.BindView;
@@ -68,12 +74,32 @@ public class MainActivity extends AppCompatActivity {
         camButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                cameraView.captureImage(new CameraKitEventCallback<CameraKitImage>() {
+                    @Override
+                    public void callback(CameraKitImage event) {
+                        imageCaptured(event);
+                    }
+                });
                 Log.i("Button", "CameraClick");
             }
         });
 
+
     }
-    
+
+    public void imageCaptured(CameraKitImage image) {
+        byte[] jpeg = image.getJpeg();
+
+        Log.i("ImageCapture", "ImageCaptured!");
+
+        long callbackTime = System.currentTimeMillis();
+        /*ResultHolder.dispose();
+        ResultHolder.setImage(jpeg);
+        ResultHolder.setNativeCaptureSize(cameraView.getCaptureSize());
+        ResultHolder.setTimeToCallback(callbackTime - captureStartTime);
+        Intent intent = new Intent(getContext(), PreviewActivity.class);
+        getContext().startActivity(intent);*/
+    }
 
     @Override
     protected void onResume() {
