@@ -19,9 +19,6 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
-import com.wonderkiln.camerakit.CameraKit;
-import com.wonderkiln.camerakit.CameraKitEventCallback;
-import com.wonderkiln.camerakit.CameraKitImage;
 
 import java.io.IOException;
 
@@ -37,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.camera)
     CameraSourcePreview cameraView;
 
-    private int cameraMethod = CameraKit.Constants.METHOD_STANDARD;
-    private int cameraFacing = CameraKit.Constants.FACING_BACK;
-
     private CameraSource mCameraSource = null;
 
     private boolean isFrontFacing = false;
@@ -54,9 +48,6 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        /*cameraView.setMethod(cameraMethod);
-        cameraView.setCropOutput(cropOutput);
-*/
 
         graphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
 
@@ -189,19 +180,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void imageCaptured(CameraKitImage image) {
-        byte[] jpeg = image.getJpeg();
 
-        Log.i("ImageCapture", "ImageCaptured!");
-
-        long callbackTime = System.currentTimeMillis();
-        /*ResultHolder.dispose();
-        ResultHolder.setImage(jpeg);
-        ResultHolder.setNativeCaptureSize(cameraView.getCaptureSize());
-        ResultHolder.setTimeToCallback(callbackTime - captureStartTime);
-        Intent intent = new Intent(getContext(), PreviewActivity.class);
-        getContext().startActivity(intent);*/
-    }
 
     protected void launchSettings(){
         Intent intent = new Intent(this, SettingsActivity.class);
