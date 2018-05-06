@@ -6,10 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -31,22 +31,16 @@ import me.connorgolden.facialtracking.ui.camera.CameraSourcePreview;
 import me.connorgolden.facialtracking.ui.camera.GraphicOverlay;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final String TAG = MainActivity.class.getSimpleName();
-
 
     @BindView(R.id.camera)
     CameraSourcePreview cameraView;
 
-    private CameraSource mCameraSource = null;
+    @BindView(R.id.faceOverlay)
+    GraphicOverlay graphicOverlay;
 
+    private CameraSource cameraSource = null;
     private boolean isFrontFacing = false;
-    private GraphicOverlay graphicOverlay;
-
-    private boolean cropOutput = false;
-
-
-    private static final int RC_HANDLE_GMS = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,21 +49,17 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-
-        graphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
-
-
         createCameraSource();
         startCameraSource();
 
-        ImageButton switchCamButton = (ImageButton) findViewById(R.id.switchCameraButton);
+        ImageButton switchCamButton = findViewById(R.id.switchCameraButton);
         switchCamButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 isFrontFacing = !isFrontFacing;
 
-                if (mCameraSource != null) {
-                    mCameraSource.release();
-                    mCameraSource = null;
+                if (cameraSource != null) {
+                    cameraSource.release();
+                    cameraSource = null;
                 }
 
                 createCameraSource();
@@ -77,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         
-        ImageButton settingButton = (ImageButton) findViewById(R.id.settingsButton);
+        ImageButton settingButton = findViewById(R.id.settingsButton);
         settingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,19 +75,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton camButton = (FloatingActionButton) findViewById(R.id.takePictureButton);
-        /*camButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton camButton = findViewById(R.id.takePictureButton);
+        camButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cameraView.captureImage(new CameraKitEventCallback<CameraKitImage>() {
-                    @Override
-                    public void callback(CameraKitImage event) {
-                        imageCaptured(event);
-                    }
-                });
-                Log.i("Button", "CameraClick");
+                //Call Take Picture
             }
-        });*/
+        });
 
 
     }
@@ -105,11 +89,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        try {
-            cameraView.start(mCameraSource, graphicOverlay);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        startCameraSource();
     }
 
     @Override
@@ -117,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
         cameraView.stop();
         super.onPause();
     }
-
 
     @NonNull
     private FaceDetector createFaceDetector(final Context context) {
@@ -180,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 3
-        mCameraSource = new CameraSource.Builder(context, detector)
+        cameraSource = new CameraSource.Builder(context, detector)
                 .setFacing(facing)
                 .setRequestedPreviewSize(320, 240)
                 .setRequestedFps(60.0f)
@@ -193,34 +172,20 @@ public class MainActivity extends AppCompatActivity {
         int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
                 getApplicationContext());
         if (code != ConnectionResult.SUCCESS) {
-            Dialog dlg = GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
+            Dialog dlg = GoogleApiAvailability.getInstance().getErrorDialog(this, code, 9001);
             dlg.show();
         }
 
-        if (mCameraSource != null) {
+        if (cameraSource != null) {
             try {
-                cameraView.start(mCameraSource, graphicOverlay);
+                cameraView.start(cameraSource, graphicOverlay);
             } catch (IOException e) {
                 Log.e(TAG, "Unable to start camera source.", e);
-                mCameraSource.release();
-                mCameraSource = null;
+                cameraSource.release();
+                cameraSource = null;
             }
         }
     }
-
-    private View.OnClickListener mSwitchCameraButtonListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            isFrontFacing = !isFrontFacing;
-
-            if (mCameraSource != null) {
-                mCameraSource.release();
-                mCameraSource = null;
-            }
-
-            createCameraSource();
-            startCameraSource();
-        }
-    };
 
     protected void launchSettings(){
         Intent intent = new Intent(this, SettingsActivity.class);
