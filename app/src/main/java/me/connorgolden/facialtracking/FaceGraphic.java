@@ -13,6 +13,12 @@ class FaceGraphic extends GraphicOverlay.Graphic {
   private boolean mIsFrontFacing;
   private volatile FaceData mFaceData;
   private Drawable poop_emoji;
+  private Drawable sad_emoji;
+  private Drawable happy_emoji;
+  private Drawable disappointed_emoji;
+  private Drawable tongue_emjoji;
+  private Drawable wink_emoji;
+  private Drawable frown_emoji;
 
 
   FaceGraphic(GraphicOverlay overlay, Context context, boolean isFrontFacing) {
@@ -23,6 +29,12 @@ class FaceGraphic extends GraphicOverlay.Graphic {
 
   private void initializeGraphics(Resources resources) {
     poop_emoji = resources.getDrawable(R.drawable.poop);
+    sad_emoji = resources.getDrawable(R.drawable.sad);
+    happy_emoji = resources.getDrawable(R.drawable.happy);
+    disappointed_emoji = resources.getDrawable(R.drawable.disappointed);
+    tongue_emjoji = resources.getDrawable(R.drawable.tongue);
+    wink_emoji = resources.getDrawable(R.drawable.wink);
+    frown_emoji = resources.getDrawable(R.drawable.frown);
   }
 
 
@@ -63,7 +75,31 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     boolean leftEyeOpen = mFaceData.isLeftEyeOpen();
     boolean rightEyeOpen = mFaceData.isRightEyeOpen();
 
-    drawOverlay(canvas, poop_emoji, left, right, bottom, top);
+    if (smiling){
+      if (rightEyeOpen && leftEyeOpen){
+        drawOverlay(canvas, happy_emoji, left, right, bottom, top);
+      }
+      else if (leftEyeOpen){
+        drawOverlay(canvas, wink_emoji, left, right, bottom, top);
+      }
+      else if (rightEyeOpen){
+        drawOverlay(canvas, tongue_emjoji, left, right, bottom, top);
+      }
+    }
+
+    else if (!smiling){
+
+      if (leftEyeOpen && !rightEyeOpen) {
+        drawOverlay(canvas, wink_emoji, left, right, bottom, top);
+      }
+
+      else if (!leftEyeOpen && !rightEyeOpen){
+        drawOverlay(canvas, disappointed_emoji, left, right, bottom, top);
+      }
+      else {
+        drawOverlay(canvas, frown_emoji, left, right, bottom, top);
+      }
+    }
 
 
 

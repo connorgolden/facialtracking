@@ -46,6 +46,36 @@ class FaceTracker extends Tracker<Face> {
     mFaceData.setPosition(face.getPosition());
     mFaceData.setWidth(face.getWidth());
     mFaceData.setHeight(face.getHeight());
+
+    //check if eyes are closed
+    final float isEyeClosedMargin = 0.5f;
+
+    //left eye
+    float leftEyeOpenProbability = face.getIsLeftEyeOpenProbability();
+    if (leftEyeOpenProbability == Face.UNCOMPUTED_PROBABILITY) {
+      mFaceData.setLeftEyeOpen(mPreviousIsLeftEyeOpen);
+    }
+    else {
+      mFaceData.setLeftEyeOpen(leftEyeOpenProbability > isEyeClosedMargin);
+      mPreviousIsLeftEyeOpen = mFaceData.isLeftEyeOpen();
+    }
+
+    //right eye
+    float rightEyeOpenProbability = face.getIsRightEyeOpenProbability();
+    if (rightEyeOpenProbability == Face.UNCOMPUTED_PROBABILITY) {
+      mFaceData.setRightEyeOpen(mPreviousIsRightEyeOpen);
+    }
+    else {
+      mFaceData.setRightEyeOpen(rightEyeOpenProbability > isEyeClosedMargin);
+      mPreviousIsRightEyeOpen = mFaceData.isRightEyeOpen();
+    }
+
+
+    // Determine if person is smiling.
+    final float isSmilingMargin = 0.3f;
+    mFaceData.setSmiling(face.getIsSmilingProbability() > isSmilingMargin);
+
+
     mFaceGraphic.update(mFaceData);
   }
 
