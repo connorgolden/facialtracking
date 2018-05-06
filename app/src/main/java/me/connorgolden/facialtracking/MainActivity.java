@@ -1,6 +1,7 @@
 package me.connorgolden.facialtracking;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.MultiProcessor;
@@ -42,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean cropOutput = false;
 
+
+    private static final int RC_HANDLE_GMS = 9001;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,40 +59,21 @@ public class MainActivity extends AppCompatActivity {
         graphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
 
 
-        Context context = getApplicationContext();
-        FaceDetector detector = createFaceDetector(context);
-
-        int facing = CameraSource.CAMERA_FACING_FRONT;
-        if (!isFrontFacing) {
-            facing = CameraSource.CAMERA_FACING_BACK;
-        }
-
-        mCameraSource = new CameraSource.Builder(context, detector)
-                .setFacing(facing)
-                .setRequestedPreviewSize(320, 240)
-                .setRequestedFps(60.0f)
-                .setAutoFocusEnabled(true)
-                .build();
-
-        try {
-            cameraView.start(mCameraSource, graphicOverlay);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        createCameraSource();
+        startCameraSource();
 
         ImageButton switchCamButton = (ImageButton) findViewById(R.id.switchCameraButton);
         switchCamButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-               /* if (cameraFacing == CameraKit.Constants.FACING_FRONT){
-                    cameraView.setFacing(CameraKit.Constants.FACING_BACK);
-                    cameraFacing = CameraKit.Constants.FACING_BACK;
-                    isFrontFacing = false;
-                } else {
-                    cameraView.setFacing(CameraKit.Constants.FACING_FRONT);
-                    cameraFacing = CameraKit.Constants.FACING_FRONT;
-                    isFrontFacing = true;
-                }*/
+                isFrontFacing = !isFrontFacing;
+
+                if (mCameraSource != null) {
+                    mCameraSource.release();
+                    mCameraSource = null;
+                }
+
+                createCameraSource();
+                startCameraSource();
             }
         });
         
@@ -130,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
         cameraView.stop();
         super.onPause();
     }
-
 
 
     @NonNull
@@ -180,12 +166,64 @@ public class MainActivity extends AppCompatActivity {
         return detector;
     }
 
+    private void createCameraSource() {
+        Log.d(TAG, "createCameraSource called.");
 
+        // 1
+        Context context = getApplicationContext();
+        FaceDetector detector = createFaceDetector(context);
 
+        // 2
+        int facing = CameraSource.CAMERA_FACING_FRONT;
+        if (!isFrontFacing) {
+            facing = CameraSource.CAMERA_FACING_BACK;
+        }
+
+        // 3
+        mCameraSource = new CameraSource.Builder(context, detector)
+                .setFacing(facing)
+                .setRequestedPreviewSize(320, 240)
+                .setRequestedFps(60.0f)
+                .setAutoFocusEnabled(true)
+                .build();
+    }
+
+    private void startCameraSource() {
+        // Make sure that the device has Google Play services available.
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
+                getApplicationContext());
+        if (code != ConnectionResult.SUCCESS) {
+            Dialog dlg = GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
+            dlg.show();
+        }
+
+        if (mCameraSource != null) {
+            try {
+                cameraView.start(mCameraSource, graphicOverlay);
+            } catch (IOException e) {
+                Log.e(TAG, "Unable to start camera source.", e);
+                mCameraSource.release();
+                mCameraSource = null;
+            }
+        }
+    }
+
+    private View.OnClickListener mSwitchCameraButtonListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            isFrontFacing = !isFrontFacing;
+
+            if (mCameraSource != null) {
+                mCameraSource.release();
+                mCameraSource = null;
+            }
+
+            createCameraSource();
+            startCameraSource();
+        }
+    };
 
     protected void launchSettings(){
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
-
 }
