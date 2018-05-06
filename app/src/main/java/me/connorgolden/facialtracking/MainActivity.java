@@ -13,34 +13,38 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.wonderkiln.camerakit.CameraKit;
-import com.wonderkiln.camerakit.CameraKitError;
-import com.wonderkiln.camerakit.CameraKitEvent;
 import com.wonderkiln.camerakit.CameraKitEventCallback;
-import com.wonderkiln.camerakit.CameraKitEventListener;
 import com.wonderkiln.camerakit.CameraKitImage;
-import com.wonderkiln.camerakit.CameraKitVideo;
-import com.wonderkiln.camerakit.CameraView;
+
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.connorgolden.facialtracking.ui.camera.CameraSourcePreview;
+import me.connorgolden.facialtracking.ui.camera.GraphicOverlay;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
     @BindView(R.id.camera)
-    CameraView cameraView;
+    CameraSourcePreview cameraView;
 
     private int cameraMethod = CameraKit.Constants.METHOD_STANDARD;
     private int cameraFacing = CameraKit.Constants.FACING_BACK;
-    private boolean mIsFrontFacing = true;
-    private GraphicOverlay mGraphicOverlay;
+
+    private CameraSource mCameraSource = null;
+
+    private boolean isFrontFacing = false;
+    private GraphicOverlay graphicOverlay;
+
     private boolean cropOutput = false;
 
     @Override
@@ -48,28 +52,49 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //DevTest
         ButterKnife.bind(this);
 
-        cameraView.setMethod(cameraMethod);
+        /*cameraView.setMethod(cameraMethod);
         cameraView.setCropOutput(cropOutput);
+*/
 
-        FaceDetector detector = new FaceDetector.Builder(getApplicationContext())
-                .setTrackingEnabled(false)
-                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+        graphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+
+
+        Context context = getApplicationContext();
+        FaceDetector detector = createFaceDetector(context);
+
+        int facing = CameraSource.CAMERA_FACING_FRONT;
+        if (!isFrontFacing) {
+            facing = CameraSource.CAMERA_FACING_BACK;
+        }
+
+        mCameraSource = new CameraSource.Builder(context, detector)
+                .setFacing(facing)
+                .setRequestedPreviewSize(320, 240)
+                .setRequestedFps(60.0f)
+                .setAutoFocusEnabled(true)
                 .build();
+
+        try {
+            cameraView.start(mCameraSource, graphicOverlay);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         ImageButton switchCamButton = (ImageButton) findViewById(R.id.switchCameraButton);
         switchCamButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (cameraFacing == CameraKit.Constants.FACING_FRONT){
+               /* if (cameraFacing == CameraKit.Constants.FACING_FRONT){
                     cameraView.setFacing(CameraKit.Constants.FACING_BACK);
                     cameraFacing = CameraKit.Constants.FACING_BACK;
+                    isFrontFacing = false;
                 } else {
                     cameraView.setFacing(CameraKit.Constants.FACING_FRONT);
                     cameraFacing = CameraKit.Constants.FACING_FRONT;
-                }
+                    isFrontFacing = true;
+                }*/
             }
         });
         
@@ -82,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         FloatingActionButton camButton = (FloatingActionButton) findViewById(R.id.takePictureButton);
-        camButton.setOnClickListener(new View.OnClickListener() {
+        /*camButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 cameraView.captureImage(new CameraKitEventCallback<CameraKitImage>() {
@@ -93,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 });
                 Log.i("Button", "CameraClick");
             }
-        });
+        });*/
 
 
     }
@@ -101,7 +126,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        cameraView.start();
+        try {
+            cameraView.start(mCameraSource, graphicOverlay);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -109,6 +138,8 @@ public class MainActivity extends AppCompatActivity {
         cameraView.stop();
         super.onPause();
     }
+
+
 
     @NonNull
     private FaceDetector createFaceDetector(final Context context) {
@@ -119,14 +150,14 @@ public class MainActivity extends AppCompatActivity {
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .setTrackingEnabled(true)
                 .setMode(FaceDetector.FAST_MODE)
-                .setProminentFaceOnly(mIsFrontFacing)
-                .setMinFaceSize(mIsFrontFacing ? 0.35f : 0.15f)
+                .setProminentFaceOnly(isFrontFacing)
+                .setMinFaceSize(isFrontFacing ? 0.35f : 0.15f)
                 .build();
 
         MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>() {
             @Override
             public Tracker<Face> create(Face face) {
-                return new FaceTracker(mGraphicOverlay, context, mIsFrontFacing);
+                return new FaceTracker(graphicOverlay, context, isFrontFacing);
             }
         };
 
@@ -136,9 +167,7 @@ public class MainActivity extends AppCompatActivity {
         if (!detector.isOperational()) {
             Log.w(TAG, "Face detector dependencies are not yet available.");
 
-            // Check the device's storage.  If there's little available storage, the native
-            // face detection library will not be downloaded, and the app won't work,
-            // so notify the user.
+            // Check the device's storage. Notifies if not enough.
             IntentFilter lowStorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
             boolean hasLowStorage = registerReceiver(null, lowStorageFilter) != null;
 
@@ -158,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return detector;
     }
-
 
 
     public void imageCaptured(CameraKitImage image) {

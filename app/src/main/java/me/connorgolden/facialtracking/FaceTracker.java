@@ -10,6 +10,8 @@ import com.google.android.gms.vision.face.FaceDetector;
 import java.util.HashMap;
 import java.util.Map;
 
+import me.connorgolden.facialtracking.ui.camera.GraphicOverlay;
+
 class FaceTracker extends Tracker<Face> {
 
   private GraphicOverlay mOverlay;

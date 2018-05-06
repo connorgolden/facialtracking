@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.connorgolden.facialtracking;
+package me.connorgolden.facialtracking.ui.camera;
 
 import android.content.Context;
 import android.graphics.Canvas;

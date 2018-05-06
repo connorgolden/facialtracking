@@ -15,14 +15,20 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <com.wonderkiln.camerakit.CameraView
+            <me.connorgolden.facialtracking.ui.camera.CameraSourcePreview
                 android:id="@+id/camera"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 app:ckFacing="back">
 
-            </com.wonderkiln.camerakit.CameraView>
+                <me.connorgolden.facialtracking.ui.camera.GraphicOverlay
+                    android:id="@+id/faceOverlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+
+            </me.connorgolden.facialtracking.ui.camera.CameraSourcePreview>
 
         </FrameLayout>
 

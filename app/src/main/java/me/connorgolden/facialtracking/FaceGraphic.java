@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 
+import me.connorgolden.facialtracking.ui.camera.GraphicOverlay;
+
 
 class FaceGraphic extends GraphicOverlay.Graphic {
 
