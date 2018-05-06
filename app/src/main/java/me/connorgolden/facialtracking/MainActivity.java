@@ -1,5 +1,6 @@
 package me.connorgolden.facialtracking;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -52,6 +53,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        FloatingActionButton camButton = (FloatingActionButton) findViewById(R.id.takePictureButton);
+        camButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchSettings();
+            }
+        });
+
     }
     
 
@@ -65,6 +74,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         cameraView.stop();
         super.onPause();
+    }
+
+
+
+    protected void launchSettings(){
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
 

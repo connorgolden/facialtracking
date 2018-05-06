@@ -10,12 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.wonderkiln.camerakit.CameraView xmlns:camerakit="http://schemas.android.com/apk/res-auto"
+        <com.wonderkiln.camerakit.CameraView
             android:id="@+id/camera"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:adjustViewBounds="true"
-            camerakit:ckFacing="back" />
+            app:ckFacing="back" />
 
     </FrameLayout>
 
