@@ -39,6 +39,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -184,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
         // 3
         cameraSource = new CameraSource.Builder(context, detector)
                 .setFacing(facing)
-                .setRequestedPreviewSize(320, 240)
+                //.setRequestedPreviewSize(320, 240)
                 .setRequestedFps(60.0f)
                 .setAutoFocusEnabled(true)
                 .build();
@@ -216,115 +217,106 @@ public class MainActivity extends AppCompatActivity {
                 private File imageFile;
                 @Override
                 public void onPictureTaken(byte[] bytes) {
-                    Log.d("TakePicture", "Picture Taken");
+                    //#1: Load Byte[] to Bitmap.
                     Bitmap loadedImage = null;
                     Bitmap rotatedBitmap = null;
-                    loadedImage = BitmapFactory.decodeByteArray(bytes, 0,
-                            bytes.length);
+                    loadedImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
-                    // rotate Image
-                    Log.v("TakePicture", String.valueOf(getWindowManager().getDefaultDisplay().getRotation()));
-
-                    //int degrees = getWindowManager().getDefaultDisplay().getRotation() + 90;
-
-                    int rotation = getWindowManager().getDefaultDisplay().getRotation();
-                    int degree = 0;
-
-                    Log.v("rotation", String.valueOf(camRotation()));
-
+                    //#2: Make matrix of the bitmap and rotate image. (Image taken sideways for some reason)
                     Matrix rotateMatrix = new Matrix();
                     rotateMatrix.postRotate(camRotation());
                     rotatedBitmap = Bitmap.createBitmap(loadedImage, 0, 0,
                             loadedImage.getWidth(), loadedImage.getHeight(),
                             rotateMatrix, false);
 
-
-
+                    //#3: Get location of Camera Roll. Either on internal or external SD card.
                     String state = Environment.getExternalStorageState();
                     File folder = null;
+
                     if (state.contains(Environment.MEDIA_MOUNTED)) {
-                        folder = new File(Environment
-                                .getExternalStorageDirectory() + "/DCIM/Camera/");
+                        folder = new File(Environment.getExternalStorageDirectory() + "/DCIM/Camera/");
                     } else {
-                        folder = new File(Environment
-                                .getExternalStorageDirectory() + "/DCIM/Camera/");
+                        folder = new File(Environment.getExternalStorageDirectory() + "/DCIM/Camera/");
                     }
 
-                    Log.v("Path", folder.toString());
 
+                    //#4: If the folder dosen't exist make one.
                     boolean success = true;
                     if (!folder.exists()) {
                         success = folder.mkdirs();
                     }
+
+                    //#5: Once folder exists, make an empty JPEG file with unique timestamp.
                     if (success) {
                         java.util.Date date = new java.util.Date();
-                        imageFile = new File(folder.getAbsolutePath()
-                                + File.separator
-                                //+ new Timestamp(date.getTime()).toString()
-                                + "Image.jpg");
+                        imageFile = new File(folder.getAbsolutePath() + File.separator
+                                + new Timestamp(date.getTime()).toString() + ".jpg");
                         try {
                             imageFile.createNewFile();
                         } catch (IOException e) {
+                            Log.e("TakePicture", "File Creation Error");
                             e.printStackTrace();
                         }
                     } else {
-                        Toast.makeText(getBaseContext(), "Image Not saved",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), "Error: Image Not Saved", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+                    //#6: Create Byte stream, and compress to JPEG.
+                    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
 
-                    // save image into gallery
-                    rotatedBitmap = resize(rotatedBitmap, 800, 600);
-                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
-
+                    //#7: Try and stream byteStream to the file created earlier.
                     try {
-                        FileOutputStream fout = new FileOutputStream(imageFile);
-                        fout.write(ostream.toByteArray());
-                        fout.close();
+                        FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
+                        fileOutputStream.write(byteStream.toByteArray());
+                        fileOutputStream.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
+                    //#8: Add metadata to file.
                     ContentValues values = new ContentValues();
-
-                    values.put(MediaStore.Images.Media.DATE_TAKEN,
-                            System.currentTimeMillis());
+                    values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
                     values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-                    values.put(MediaStore.MediaColumns.DATA,
-                            imageFile.getAbsolutePath());
+                    values.put(MediaStore.MediaColumns.DATA, imageFile.getAbsolutePath());
 
-                    MainActivity.this.getContentResolver().insert(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                    setResult(Activity.RESULT_OK); //add this
-
+                    //  MainActivity.this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                    //setResult(Activity.RESULT_OK); //add this
                 }
             });
         }catch (Exception e){
             Log.e("TakePicture", e.toString());
+            Toast.makeText(getBaseContext(), "Error: Image Not Taken", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
-        if (maxHeight > 0 && maxWidth > 0) {
-            int width = image.getWidth();
-            int height = image.getHeight();
-            float ratioBitmap = (float) width / (float) height;
-            float ratioMax = (float) maxWidth / (float) maxHeight;
+    private int camRotation() {
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        Log.i("Rotation", String.valueOf(rotation));
+        int degree = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degree = 90;
+                break;
+            case Surface.ROTATION_90:
+                degree = 0;
+                break;
+            case Surface.ROTATION_180:
+                degree = -90;
+                break;
+            case Surface.ROTATION_270:
+                degree = -180;
+                break;
 
-            int finalWidth = maxWidth;
-            int finalHeight = maxHeight;
-            if (ratioMax > 1) {
-                finalWidth = (int) ((float) maxHeight * ratioBitmap);
-            } else {
-                finalHeight = (int) ((float) maxWidth / ratioBitmap);
-            }
-            image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
-            return image;
-        } else {
-            return image;
+            default:
+                break;
+        }
+
+        if (isFrontFacing && rotation == Surface.ROTATION_0){
+            return degree-180;
+        }else{
+            return degree;
         }
     }
 
@@ -358,40 +350,4 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
-
-    private int camRotation() {
-
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
-        int degree = 0;
-        switch (rotation) {
-            case Surface.ROTATION_0:
-                degree = 90;
-                break;
-            case Surface.ROTATION_90:
-                degree = -180;
-                break;
-            case Surface.ROTATION_180:
-                degree = 270;
-                break;
-            case Surface.ROTATION_270:
-                degree = 0;
-                break;
-
-            default:
-                break;
-        }
-
-       /* if (CameraSource.f == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            // frontFacing
-            rotation = (info.orientation + degree) % 330;
-            rotation = (360 - rotation) % 360;
-        } else {
-            // Back-facing
-            rotation = (rotation - degree + 360) % 360;
-        }
-        */
-
-        return degree;
-    }
-
 }
