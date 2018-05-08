@@ -11,7 +11,10 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -257,9 +260,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onPictureTaken(byte[] bytes) {
 
-
-
-
                     //#1: Load Byte[] to Bitmap.
                     Bitmap loadedImage = null;
                     Bitmap rotatedBitmap = null;
@@ -310,6 +310,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if (showEmoji){
                         //combine pictures
+                        overlay(rotatedBitmap,getOverlayBitmap()).compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
                     }else {
                         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
                     }
@@ -338,6 +339,31 @@ public class MainActivity extends AppCompatActivity {
             Log.e("TakePicture", e.toString());
             Toast.makeText(getBaseContext(), "Error: Image Not Taken", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private Bitmap getOverlayBitmap(){
+        View overlay = findViewById(R.id.camera);
+        Bitmap bitmap = Bitmap.createBitmap(overlay.getWidth(),overlay.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        Drawable bgDrawable =overlay.getBackground();
+        if (bgDrawable!=null){
+            //has background drawable, then draw it on the canvas
+            bgDrawable.draw(canvas);
+        }else{
+            canvas.drawColor(Color.WHITE);
+        }
+
+        overlay.draw(canvas);
+        return bitmap;
+    }
+
+    private Bitmap overlay(Bitmap bitmap1, Bitmap bitmap2) {
+        Bitmap overlay = Bitmap.createBitmap(bitmap1.getWidth(), bitmap1.getHeight(), bitmap1.getConfig());
+        Canvas canvas = new Canvas(overlay);
+        canvas.drawBitmap(bitmap1, new Matrix(), null);
+        canvas.drawBitmap(bitmap2, new Matrix(), null);
+        return overlay;
     }
 
     private int camRotation() {
