@@ -111,8 +111,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final View face = findViewById(R.id.faceOverlay);
-
 
         final ToggleButton tggl;
 
@@ -124,12 +122,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!tggl.isChecked()) {
                     setTracking = false;
-                    face.setVisibility(View.INVISIBLE);
+                    cameraSource.release();
+                    createCameraSource();
+                    startCameraSource();
 
                 }
                 else {
                     setTracking = true;
-                    face.setVisibility(View.VISIBLE);
+                    cameraSource.release();
+                    createCameraSource();
+                    startCameraSource();
                 }
             }
         });
@@ -153,7 +155,6 @@ public class MainActivity extends AppCompatActivity {
     @NonNull
     private FaceDetector createFaceDetector(final Context context) {
 
-        if (this.setTracking) {
 
             Log.d(TAG, "createFaceDetector called.");
 
@@ -169,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
             MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>() {
                 @Override
                 public Tracker<Face> create(Face face) {
-                    return new FaceTracker(graphicOverlay, context, isFrontFacing);
+                    return new FaceTracker(graphicOverlay, context, isFrontFacing, setTracking);
                 }
             };
 
@@ -198,16 +199,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             return detector;
-        }
-        else {
-            return null;
-        }
-    }
 
-    private void setTracking(){
-        graphicOverlay.clear();
 
     }
+
+
 
     private void createCameraSource() {
         Log.d(TAG, "createCameraSource called.");

@@ -25,26 +25,42 @@ class FaceTracker extends Tracker<Face> {
   private boolean mPreviousIsLeftEyeOpen = true;
   private boolean mPreviousIsRightEyeOpen = true;
 
+  private boolean setTracking = true;
+
   private Map<Integer, PointF> mPreviousLandmarkPositions = new HashMap<>();
 
-  FaceTracker(GraphicOverlay overlay, Context context, boolean isFrontFacing) {
+  FaceTracker(GraphicOverlay overlay, Context context, boolean isFrontFacing, boolean setTracking) {
     mOverlay = overlay;
     mContext = context;
     mIsFrontFacing = isFrontFacing;
     mFaceData = new FaceData();
+
+    this.setTracking = setTracking;
+
   }
 
 
   @Override
   public void onNewItem(int id, Face face) {
+
+    //checks if tracking is enabled
+    if (!this.setTracking){
+      mOverlay.remove(mFaceGraphic);
+      return;
+    }
+
     mFaceGraphic = new FaceGraphic(mOverlay, mContext, mIsFrontFacing);
   }
 
   @Override
   public void onUpdate(FaceDetector.Detections detectionResults, Face face) {
+
+    if (!this.setTracking){
+      mOverlay.remove(mFaceGraphic);
+      return;
+    }
+
     mOverlay.add(mFaceGraphic);
-
-
 
     // Get face dimensions.
     mFaceData.setPosition(face.getPosition());
