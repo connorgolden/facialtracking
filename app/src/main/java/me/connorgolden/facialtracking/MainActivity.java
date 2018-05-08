@@ -98,7 +98,8 @@ public class MainActivity extends AppCompatActivity {
         settingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchSettings();
+                Toast.makeText(MainActivity.this, "Customization Coming Soon\u2122", Toast.LENGTH_LONG).show();
+                //launchSettings();
             }
         });
 
