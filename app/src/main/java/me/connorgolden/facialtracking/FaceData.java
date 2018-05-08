@@ -3,6 +3,8 @@ package me.connorgolden.facialtracking;
 
 import android.graphics.PointF;
 
+import me.connorgolden.facialtracking.ui.camera.GraphicOverlay;
+
 public class FaceData {
 
   private int mId;
@@ -34,6 +36,8 @@ public class FaceData {
   private PointF mMouthLeftPosition;
   private PointF mMouthBottomPosition;
   private PointF mMouthRightPosition;
+
+
 
 
   public int getId() {

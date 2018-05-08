@@ -1,6 +1,8 @@
 package me.connorgolden.facialtracking;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.PointF;
 
 import com.google.android.gms.vision.Tracker;
@@ -42,6 +44,8 @@ class FaceTracker extends Tracker<Face> {
   public void onUpdate(FaceDetector.Detections detectionResults, Face face) {
     mOverlay.add(mFaceGraphic);
 
+
+
     // Get face dimensions.
     mFaceData.setPosition(face.getPosition());
     mFaceData.setWidth(face.getWidth());
@@ -77,6 +81,9 @@ class FaceTracker extends Tracker<Face> {
 
 
     mFaceGraphic.update(mFaceData);
+
+
+
   }
 
 

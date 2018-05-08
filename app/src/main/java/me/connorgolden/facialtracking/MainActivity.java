@@ -25,6 +25,7 @@ import android.view.Surface;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -59,22 +60,17 @@ public class MainActivity extends AppCompatActivity {
     private CameraSource cameraSource = null;
     private boolean isFrontFacing = false;
     private boolean showEmoji = true;
+    private boolean setTracking = true;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
 
-        if (checkStoragePermission() == false){
-            requestStoragePermission();}
-
-        createCameraSource();
-        startCameraSource();
-
-
+        requestStoragePermission();
 
         ImageButton switchCamButton = findViewById(R.id.switchCameraButton);
         switchCamButton.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         
-        ImageButton settingButton = findViewById(R.id.settingsButton);
+        final ImageButton settingButton = findViewById(R.id.settingsButton);
         settingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,6 +102,30 @@ public class MainActivity extends AppCompatActivity {
                 takePicture();
             }
         });
+
+        final View face = findViewById(R.id.faceOverlay);
+
+
+        final ToggleButton tggl;
+
+        tggl = findViewById(R.id.trackingButton);
+        tggl.setChecked(true);
+
+        tggl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!tggl.isChecked()) {
+                    setTracking = false;
+                    face.setVisibility(View.INVISIBLE);
+
+                }
+                else {
+                    setTracking = true;
+                    face.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
 
 
     }
@@ -124,49 +144,61 @@ public class MainActivity extends AppCompatActivity {
 
     @NonNull
     private FaceDetector createFaceDetector(final Context context) {
-        Log.d(TAG, "createFaceDetector called.");
 
-        FaceDetector detector = new FaceDetector.Builder(context)
-                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
-                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
-                .setTrackingEnabled(true)
-                .setMode(FaceDetector.FAST_MODE)
-                .setProminentFaceOnly(isFrontFacing)
-                .setMinFaceSize(isFrontFacing ? 0.35f : 0.15f)
-                .build();
+        if (this.setTracking) {
 
-        MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>() {
-            @Override
-            public Tracker<Face> create(Face face) {
-                return new FaceTracker(graphicOverlay, context, isFrontFacing);
+            Log.d(TAG, "createFaceDetector called.");
+
+            FaceDetector detector = new FaceDetector.Builder(context)
+                    .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+                    .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                    .setTrackingEnabled(true)
+                    .setMode(FaceDetector.FAST_MODE)
+                    .setProminentFaceOnly(isFrontFacing)
+                    .setMinFaceSize(isFrontFacing ? 0.35f : 0.15f)
+                    .build();
+
+            MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>() {
+                @Override
+                public Tracker<Face> create(Face face) {
+                    return new FaceTracker(graphicOverlay, context, isFrontFacing);
+                }
+            };
+
+            Detector.Processor<Face> processor = new MultiProcessor.Builder<>(factory).build();
+            detector.setProcessor(processor);
+
+            if (!detector.isOperational()) {
+                Log.w(TAG, "Face detector dependencies are not yet available.");
+
+                // Check the device's storage. Notifies if not enough.
+                IntentFilter lowStorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+                boolean hasLowStorage = registerReceiver(null, lowStorageFilter) != null;
+
+                if (hasLowStorage) {
+                    Log.w(TAG, getString(R.string.low_storage_error));
+                    DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            finish();
+                        }
+                    };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(R.string.app_name)
+                            .setMessage(R.string.low_storage_error)
+                            .setPositiveButton(R.string.disappointed_ok, listener)
+                            .show();
+                }
             }
-        };
-
-        Detector.Processor<Face> processor = new MultiProcessor.Builder<>(factory).build();
-        detector.setProcessor(processor);
-
-        if (!detector.isOperational()) {
-            Log.w(TAG, "Face detector dependencies are not yet available.");
-
-            // Check the device's storage. Notifies if not enough.
-            IntentFilter lowStorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
-            boolean hasLowStorage = registerReceiver(null, lowStorageFilter) != null;
-
-            if (hasLowStorage) {
-                Log.w(TAG, getString(R.string.low_storage_error));
-                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        finish();
-                    }
-                };
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.app_name)
-                        .setMessage(R.string.low_storage_error)
-                        .setPositiveButton(R.string.disappointed_ok, listener)
-                        .show();
-            }
+            return detector;
         }
-        return detector;
+        else {
+            return null;
+        }
+    }
+
+    private void setTracking(){
+        graphicOverlay.clear();
+
     }
 
     private void createCameraSource() {
@@ -175,6 +207,8 @@ public class MainActivity extends AppCompatActivity {
         // 1
         Context context = getApplicationContext();
         FaceDetector detector = createFaceDetector(context);
+
+        //detector.release();
 
         // 2
         int facing = CameraSource.CAMERA_FACING_FRONT;
@@ -211,12 +245,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void takePicture(){
         try{
             cameraSource.takePicture(null, new CameraSource.PictureCallback() {
                 private File imageFile;
                 @Override
                 public void onPictureTaken(byte[] bytes) {
+
+
+
+
                     //#1: Load Byte[] to Bitmap.
                     Bitmap loadedImage = null;
                     Bitmap rotatedBitmap = null;

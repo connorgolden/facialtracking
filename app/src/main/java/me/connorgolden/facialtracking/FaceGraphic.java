@@ -40,7 +40,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
 
   void update(FaceData faceData) {
     mFaceData = faceData;
-    postInvalidate(); // Trigger a redraw of the graphic (i.e. cause draw() to be called).
+    postInvalidate(); //Trigger a redraw of the graphic (i.e. cause draw() to be called).
   }
 
 

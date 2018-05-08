@@ -56,13 +56,16 @@
                 android:background="#000"
                 app:srcCompat="@drawable/ic_flash_off_white_24dp" />
 
-            <ImageButton
-                android:id="@+id/imageButton3"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#000"
-                app:srcCompat="@drawable/ic_insert_emoticon_yellow_24dp" />
+            <ToggleButton
+                android:id="@+id/trackingButton"
+                style="@android:style/Widget.Holo.Light.Button.Toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:gravity="center" />
+                //android:background="@drawable/toggle_selector"/>
+
+
 
             <ImageButton
                 android:id="@+id/switchCameraButton"
