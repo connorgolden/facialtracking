@@ -7,6 +7,11 @@ import android.graphics.drawable.Drawable;
 
 import me.connorgolden.facialtracking.ui.camera.GraphicOverlay;
 
+/**
+ * FaceGraphic class
+ * this class handles the intialization of drawables, its size, and the required type.
+ */
+
 
 class FaceGraphic extends GraphicOverlay.Graphic {
 
@@ -32,6 +37,11 @@ class FaceGraphic extends GraphicOverlay.Graphic {
 
   }
 
+  /**
+   * initializes every drawable for each emotional state detected
+   * @param resources
+   */
+
   private void initializeGraphics(Resources resources) {
     poop_emoji = resources.getDrawable(R.drawable.poop);
     sad_emoji = resources.getDrawable(R.drawable.sad);
@@ -43,16 +53,35 @@ class FaceGraphic extends GraphicOverlay.Graphic {
   }
 
 
+  /**
+   * Updates the face instance from the detection of the most recent frame.  Invalidates the
+   * relevant portions of the overlay to trigger a redraw.
+   */
   void update(FaceData faceData) {
     mFaceData = faceData;
     postInvalidate(); //Trigger a redraw of the graphic (i.e. cause draw() to be called).
   }
 
+  /**
+   * draws the overlay according to face detected
+   * @param canvas drawing canvas
+   * @param drawState drawable based on detected emotion
+   * @param left size parameter
+   * @param right size parameter
+   * @param bottom size parameter
+   * @param top size parameter
+   */
 
   private void drawOverlay(Canvas canvas, Drawable drawState, int left, int right, int bottom, int top) {
     drawState.setBounds(left, top, right, bottom);
     drawState.draw(canvas);
   }
+
+  /**
+   * draw first handles sizing and scale of the drawable that is supposed to be overlayed on detected face.
+   * secondly, according to it's emotional state it utilizes the correct drawable
+   * @param canvas drawing canvas
+   */
 
   @Override
   public void draw(Canvas canvas) {
@@ -60,12 +89,6 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     if (mFaceData == null) {
       return;
     }
-
-    //if (!this.setTracking){
-      //return;
-    //}
-
-
 
     //get X and Y coordinates
     float x = translateX(mFaceData.getPosition().x + mFaceData.getWidth() / 2.0f);
@@ -109,15 +132,5 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         drawOverlay(canvas, frown_emoji, left, right, bottom, top);
       }
     }
-
-
-
-        /* if necessary to get position of certain facialfeature
-         PointF detectNoseBasePosition = mFaceData.getNoseBasePosition();
-        PointF noseBasePosition = new PointF(translateX(detectNoseBasePosition.x),
-                translateY(detectNoseBasePosition.y));
-         */
-
   }
-
 }

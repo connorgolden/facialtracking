@@ -5,6 +5,10 @@ import android.graphics.PointF;
 
 import me.connorgolden.facialtracking.ui.camera.GraphicOverlay;
 
+/**
+ * FaceData class stores datamembers needed for face detection and creating overlays
+ */
+
 public class FaceData {
 
   private int mId;

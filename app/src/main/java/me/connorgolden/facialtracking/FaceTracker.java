@@ -14,6 +14,11 @@ import java.util.Map;
 
 import me.connorgolden.facialtracking.ui.camera.GraphicOverlay;
 
+/**
+ * FaceTracker class
+ * creates a tracker for each new face detected, and updates them accordingly
+ */
+
 class FaceTracker extends Tracker<Face> {
 
   private GraphicOverlay mOverlay;
@@ -40,6 +45,9 @@ class FaceTracker extends Tracker<Face> {
   }
 
 
+  /**
+   * Start tracking the detected face instance within the face overlay.
+   */
   @Override
   public void onNewItem(int id, Face face) {
 
@@ -52,9 +60,14 @@ class FaceTracker extends Tracker<Face> {
     mFaceGraphic = new FaceGraphic(mOverlay, mContext, mIsFrontFacing);
   }
 
+  /**
+   * Update the position/characteristics of the face within the overlay.
+   * Checks emotional state
+   */
   @Override
   public void onUpdate(FaceDetector.Detections detectionResults, Face face) {
 
+    //check if tracking is enabled
     if (!this.setTracking){
       mOverlay.remove(mFaceGraphic);
       return;
@@ -102,12 +115,18 @@ class FaceTracker extends Tracker<Face> {
 
   }
 
-
+  /**
+   * When no face detected it hides the graphic overlay from  CameraSourcePreview
+   */
   @Override
   public void onMissing(FaceDetector.Detections<Face> detectionResults) {
     mOverlay.remove(mFaceGraphic);
   }
 
+
+  /**
+   * When presumed that a face is gone forgood, it deletes the graphic object
+   */
   @Override
   public void onDone() {
     mOverlay.remove(mFaceGraphic);

@@ -51,6 +51,11 @@ import butterknife.ButterKnife;
 import me.connorgolden.facialtracking.ui.camera.CameraSourcePreview;
 import me.connorgolden.facialtracking.ui.camera.GraphicOverlay;
 
+/**
+ * @author Connor Golden
+ * @author Jochem Dierx
+ */
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -66,6 +71,11 @@ public class MainActivity extends AppCompatActivity {
     private boolean showEmoji = true;
     private boolean setTracking = true;
 
+
+    /**
+     * On creation of the app it initializes the UI and handles user interaction.
+     * @param savedInstanceState
+     */
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -152,6 +162,14 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+
+    /**
+     * This method handles the creation and initialization of a FaceDetector object.
+     * This is used to detect faces
+     * @param context
+     * @return  face tracking detector
+     */
+
     @NonNull
     private FaceDetector createFaceDetector(final Context context) {
 
@@ -203,24 +221,23 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     * createCameraSource creates a CameraSource object needed to utilize the device's camera for image capturing
+     */
 
     private void createCameraSource() {
         Log.d(TAG, "createCameraSource called.");
 
-        // 1
+
         Context context = getApplicationContext();
         FaceDetector detector = createFaceDetector(context);
 
-        //detector.release();
 
-        // 2
         int facing = CameraSource.CAMERA_FACING_FRONT;
         if (!isFrontFacing) {
             facing = CameraSource.CAMERA_FACING_BACK;
         }
 
-        // 3
         cameraSource = new CameraSource.Builder(context, detector)
                 .setFacing(facing)
                 //.setRequestedPreviewSize(320, 240)
@@ -228,6 +245,10 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoFocusEnabled(true)
                 .build();
     }
+
+    /**
+     * startCameraSource checks if CameraSource is able to run
+     */
 
     private void startCameraSource() {
         // Make sure that the device has Google Play services available.
@@ -248,6 +269,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    /**
+     * takePicture does the image capturing for CameraSource
+     */
 
 
     private void takePicture(){
