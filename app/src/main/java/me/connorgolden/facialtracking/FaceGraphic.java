@@ -20,11 +20,16 @@ class FaceGraphic extends GraphicOverlay.Graphic {
   private Drawable wink_emoji;
   private Drawable frown_emoji;
 
+  private boolean setTracking;
+
 
   FaceGraphic(GraphicOverlay overlay, Context context, boolean isFrontFacing) {
     super(overlay);
     Resources resources = context.getResources();
     initializeGraphics(resources);
+
+    this.setTracking = setTracking;
+
   }
 
   private void initializeGraphics(Resources resources) {
@@ -55,6 +60,10 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     if (mFaceData == null) {
       return;
     }
+
+    //if (!this.setTracking){
+      //return;
+    //}
 
 
 
