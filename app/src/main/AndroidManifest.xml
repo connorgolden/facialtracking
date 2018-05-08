@@ -29,3 +29,6 @@
     </application>
 
 </manifest>
+
+
+<!--android:hardwareAccelerated="false"-->

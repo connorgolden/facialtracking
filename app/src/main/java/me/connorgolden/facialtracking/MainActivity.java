@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -72,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
 
         requestStoragePermission();
 
+        createCameraSource();
+        startCameraSource();
+
         ImageButton switchCamButton = findViewById(R.id.switchCameraButton);
         switchCamButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -95,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton camButton = findViewById(R.id.takePictureButton);
+        Button camButton = findViewById(R.id.takePictureButton);
         camButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -303,7 +307,13 @@ public class MainActivity extends AppCompatActivity {
 
                     //#6: Create Byte stream, and compress to JPEG.
                     ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
+
+                    if (showEmoji){
+                        //combine pictures
+                    }else {
+                        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
+                    }
+
 
                     //#7: Try and stream byteStream to the file created earlier.
                     try {

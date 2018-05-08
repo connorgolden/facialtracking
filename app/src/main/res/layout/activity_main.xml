@@ -4,35 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.connorgolden.facialtracking.MainActivity">
+    tools:context="me.connorgolden.facialtracking.MainActivity"
+    tools:layout_editor_absoluteY="25dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <me.connorgolden.facialtracking.ui.camera.CameraSourcePreview
-                android:id="@+id/camera"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                app:ckFacing="back">
-
-                <me.connorgolden.facialtracking.ui.camera.GraphicOverlay
-                    android:id="@+id/faceOverlay"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    />
-
-            </me.connorgolden.facialtracking.ui.camera.CameraSourcePreview>
-
-        </FrameLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:alpha="0.40"
@@ -76,23 +57,51 @@
                 app:srcCompat="@drawable/ic_switch_camera_white_24dp" />
         </LinearLayout>
 
-    </RelativeLayout>
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/takePictureButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_camera_black_24dp" />
+            <me.connorgolden.facialtracking.ui.camera.CameraSourcePreview
+                android:id="@+id/camera"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:adjustViewBounds="true"
+                app:ckFacing="back"
+                app:layout_constraintDimensionRatio="H,3:4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <me.connorgolden.facialtracking.ui.camera.GraphicOverlay
+                    android:id="@+id/faceOverlay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+            </me.connorgolden.facialtracking.ui.camera.CameraSourcePreview>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            tools:layout_editor_absoluteY="40dp">
+
+            <Button
+                android:id="@+id/takePictureButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="Hi" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 
 </android.support.constraint.ConstraintLayout>
