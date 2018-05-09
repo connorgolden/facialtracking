@@ -4,32 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.connorgolden.facialtracking.MainActivity">
+    tools:context="me.connorgolden.facialtracking.MainActivity"
+    tools:layout_editor_absoluteY="25dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <com.wonderkiln.camerakit.CameraView
-                android:id="@+id/camera"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                app:ckFacing="back">
-
-            </com.wonderkiln.camerakit.CameraView>
-
-        </FrameLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:alpha="0.40"
+            android:alpha="1"
             android:background="#000"
             android:orientation="horizontal">
 
@@ -42,21 +29,16 @@
                 android:background="#000"
                 app:srcCompat="@drawable/ic_settings_white_24dp" />
 
-            <ImageButton
-                android:id="@+id/imageButton2"
-                android:layout_width="match_parent"
+            <ToggleButton
+                android:id="@+id/trackingButton"
+                style="@android:style/Widget.Holo.Light.Button.Toggle"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#000"
-                app:srcCompat="@drawable/ic_flash_off_white_24dp" />
+                android:checked="true"
+                android:gravity="center" />
+                //android:background="@drawable/toggle_selector"/>
 
-            <ImageButton
-                android:id="@+id/imageButton3"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#000"
-                app:srcCompat="@drawable/ic_insert_emoticon_yellow_24dp" />
+
 
             <ImageButton
                 android:id="@+id/switchCameraButton"
@@ -67,23 +49,73 @@
                 app:srcCompat="@drawable/ic_switch_camera_white_24dp" />
         </LinearLayout>
 
-    </RelativeLayout>
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/takePictureButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_camera_black_24dp" />
+            <me.connorgolden.facialtracking.ui.camera.CameraSourcePreview
+                android:id="@+id/camera"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:adjustViewBounds="true"
+                app:ckFacing="back"
+                app:layout_constraintDimensionRatio="H,3:4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <me.connorgolden.facialtracking.ui.camera.GraphicOverlay
+                    android:id="@+id/faceOverlay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+            </me.connorgolden.facialtracking.ui.camera.CameraSourcePreview>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            tools:layout_editor_absoluteY="40dp">
+
+            <ImageButton
+                android:id="@+id/takePictureButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="100dp"
+                android:layout_marginStart="100dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/rounded"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/ic_camera_black_24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/galleryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/takePictureButton"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_photo_library_black_24dp" />
+        </android.support.constraint.ConstraintLayout>
+
+    </LinearLayout>
 
 
 </android.support.constraint.ConstraintLayout>
