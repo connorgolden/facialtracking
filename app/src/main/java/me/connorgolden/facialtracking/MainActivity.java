@@ -1,6 +1,5 @@
 package me.connorgolden.facialtracking;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
@@ -19,14 +18,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -74,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * On creation of the app it initializes the UI and handles user interaction.
+     *
      * @param savedInstanceState
      */
 
@@ -103,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 startCameraSource();
             }
         });
-        
+
         final ImageButton settingButton = findViewById(R.id.settingsButton);
         settingButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,8 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     createCameraSource();
                     startCameraSource();
 
-                }
-                else {
+                } else {
                     setTracking = true;
                     cameraSource.release();
                     createCameraSource();
@@ -157,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
 
 
     }
@@ -178,57 +174,58 @@ public class MainActivity extends AppCompatActivity {
     /**
      * This method handles the creation and initialization of a FaceDetector object.
      * This is used to detect faces
+     *
      * @param context
-     * @return  face tracking detector
+     * @return face tracking detector
      */
 
     @NonNull
     private FaceDetector createFaceDetector(final Context context) {
 
 
-            Log.d(TAG, "createFaceDetector called.");
+        Log.d(TAG, "createFaceDetector called.");
 
-            FaceDetector detector = new FaceDetector.Builder(context)
-                    .setLandmarkType(FaceDetector.ALL_LANDMARKS)
-                    .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
-                    .setTrackingEnabled(true)
-                    .setMode(FaceDetector.FAST_MODE)
-                    .setProminentFaceOnly(isFrontFacing)
-                    .setMinFaceSize(isFrontFacing ? 0.35f : 0.15f)
-                    .build();
+        FaceDetector detector = new FaceDetector.Builder(context)
+                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                .setTrackingEnabled(true)
+                .setMode(FaceDetector.FAST_MODE)
+                .setProminentFaceOnly(isFrontFacing)
+                .setMinFaceSize(isFrontFacing ? 0.35f : 0.15f)
+                .build();
 
-            MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>() {
-                @Override
-                public Tracker<Face> create(Face face) {
-                    return new FaceTracker(graphicOverlay, context, isFrontFacing, setTracking);
-                }
-            };
-
-            Detector.Processor<Face> processor = new MultiProcessor.Builder<>(factory).build();
-            detector.setProcessor(processor);
-
-            if (!detector.isOperational()) {
-                Log.w(TAG, "Face detector dependencies are not yet available.");
-
-                // Check the device's storage. Notifies if not enough.
-                IntentFilter lowStorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
-                boolean hasLowStorage = registerReceiver(null, lowStorageFilter) != null;
-
-                if (hasLowStorage) {
-                    Log.w(TAG, getString(R.string.low_storage_error));
-                    DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            finish();
-                        }
-                    };
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle(R.string.app_name)
-                            .setMessage(R.string.low_storage_error)
-                            .setPositiveButton(R.string.disappointed_ok, listener)
-                            .show();
-                }
+        MultiProcessor.Factory<Face> factory = new MultiProcessor.Factory<Face>() {
+            @Override
+            public Tracker<Face> create(Face face) {
+                return new FaceTracker(graphicOverlay, context, isFrontFacing, setTracking);
             }
-            return detector;
+        };
+
+        Detector.Processor<Face> processor = new MultiProcessor.Builder<>(factory).build();
+        detector.setProcessor(processor);
+
+        if (!detector.isOperational()) {
+            Log.w(TAG, "Face detector dependencies are not yet available.");
+
+            // Check the device's storage. Notifies if not enough.
+            IntentFilter lowStorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+            boolean hasLowStorage = registerReceiver(null, lowStorageFilter) != null;
+
+            if (hasLowStorage) {
+                Log.w(TAG, getString(R.string.low_storage_error));
+                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                };
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.app_name)
+                        .setMessage(R.string.low_storage_error)
+                        .setPositiveButton(R.string.disappointed_ok, listener)
+                        .show();
+            }
+        }
+        return detector;
 
 
     }
@@ -287,10 +284,11 @@ public class MainActivity extends AppCompatActivity {
      */
 
 
-    private void takePicture(){
-        try{
+    private void takePicture() {
+        try {
             cameraSource.takePicture(null, new CameraSource.PictureCallback() {
                 private File imageFile;
+
                 @Override
                 public void onPictureTaken(byte[] bytes) {
 
@@ -342,10 +340,10 @@ public class MainActivity extends AppCompatActivity {
                     //#6: Create Byte stream, and compress to JPEG.
                     ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 
-                    if (showEmoji){
+                    if (showEmoji) {
                         //combine pictures
-                        overlay(rotatedBitmap,getOverlayBitmap()).compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
-                    }else {
+                        overlay(rotatedBitmap, getOverlayBitmap()).compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
+                    } else {
                         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
                     }
 
@@ -366,22 +364,22 @@ public class MainActivity extends AppCompatActivity {
                     values.put(MediaStore.MediaColumns.DATA, imageFile.getAbsolutePath());
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e("TakePicture", e.toString());
             Toast.makeText(getBaseContext(), "Error: Image Not Taken", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private Bitmap getOverlayBitmap(){
+    private Bitmap getOverlayBitmap() {
         View overlay = findViewById(R.id.camera);
-        Bitmap bitmap = Bitmap.createBitmap(overlay.getWidth(),overlay.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(overlay.getWidth(), overlay.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
-        Drawable bgDrawable =overlay.getBackground();
-        if (bgDrawable!=null){
+        Drawable bgDrawable = overlay.getBackground();
+        if (bgDrawable != null) {
             //has background drawable, then draw it on the canvas
             bgDrawable.draw(canvas);
-        }else{
+        } else {
             canvas.drawColor(Color.WHITE);
         }
 
@@ -419,9 +417,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-        if (isFrontFacing && rotation == Surface.ROTATION_0){
-            return degree-180;
-        }else{
+        if (isFrontFacing && rotation == Surface.ROTATION_0) {
+            return degree - 180;
+        } else {
             return degree;
         }
     }
@@ -452,7 +450,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    protected void launchSettings(){
+    protected void launchSettings() {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
