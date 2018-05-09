@@ -16,7 +16,7 @@
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:alpha="0.40"
+            android:alpha="1"
             android:background="#000"
             android:orientation="horizontal">
 
@@ -29,19 +29,11 @@
                 android:background="#000"
                 app:srcCompat="@drawable/ic_settings_white_24dp" />
 
-            <ImageButton
-                android:id="@+id/imageButton2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#000"
-                app:srcCompat="@drawable/ic_flash_off_white_24dp" />
-
             <ToggleButton
                 android:id="@+id/trackingButton"
                 style="@android:style/Widget.Holo.Light.Button.Toggle"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:checked="true"
                 android:gravity="center" />
                 //android:background="@drawable/toggle_selector"/>
@@ -88,27 +80,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@color/colorPrimary"
             tools:layout_editor_absoluteY="40dp">
 
-            <Button
+            <ImageButton
                 android:id="@+id/takePictureButton"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="100dp"
                 android:layout_marginStart="100dp"
                 android:layout_marginTop="8dp"
+                android:background="@drawable/rounded"
                 android:clickable="true"
                 android:focusable="true"
-                android:text="Hi"
+                android:src="@drawable/ic_camera_black_24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
-                android:id="@+id/imageButton"
-                android:layout_width="0dp"
+                android:id="@+id/galleryButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
@@ -118,7 +112,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/takePictureButton"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@android:drawable/alert_dark_frame" />
+                app:srcCompat="@drawable/ic_photo_library_black_24dp" />
         </android.support.constraint.ConstraintLayout>
 
     </LinearLayout>

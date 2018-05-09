@@ -113,11 +113,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button camButton = findViewById(R.id.takePictureButton);
+        ImageButton camButton = findViewById(R.id.takePictureButton);
         camButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 takePicture();
+            }
+        });
+
+        ImageButton galleryButton = findViewById(R.id.galleryButton);
+        galleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(android.content.Intent.ACTION_VIEW);
+                intent.setType("image/*");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
 
@@ -352,9 +364,6 @@ public class MainActivity extends AppCompatActivity {
                     values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
                     values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
                     values.put(MediaStore.MediaColumns.DATA, imageFile.getAbsolutePath());
-
-                    //  MainActivity.this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                    //setResult(Activity.RESULT_OK); //add this
                 }
             });
         }catch (Exception e){
