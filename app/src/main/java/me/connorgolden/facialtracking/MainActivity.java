@@ -1,5 +1,6 @@
 package me.connorgolden.facialtracking;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
@@ -82,7 +83,10 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        requestCameraPermission();
         requestStoragePermission();
+
+
 
         createCameraSource();
         startCameraSource();
@@ -440,6 +444,16 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
         }
     }
+
+    private void requestCameraPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.CAMERA)) {
+            Toast.makeText(MainActivity.this, "Camera permission allows us to take images. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.CAMERA}, 2);
+        }
+    }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
