@@ -342,7 +342,8 @@ public class MainActivity extends AppCompatActivity {
 
                     if (showEmoji) {
                         //combine pictures
-                        overlay(rotatedBitmap, getOverlayBitmap()).compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
+                        Bitmap newbitmap = overlay(rotatedBitmap, getOverlayBitmap());
+                        newbitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
                     } else {
                         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteStream);
                     }
@@ -388,12 +389,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Bitmap overlay(Bitmap bitmap1, Bitmap bitmap2) {
+        Bitmap resizedOverlay = Bitmap.createScaledBitmap(bitmap2, bitmap1.getWidth(),bitmap1.getHeight(),false);
         Bitmap overlay = Bitmap.createBitmap(bitmap1.getWidth(), bitmap1.getHeight(), bitmap1.getConfig());
         Canvas canvas = new Canvas(overlay);
         canvas.drawBitmap(bitmap1, new Matrix(), null);
-        canvas.drawBitmap(bitmap2, new Matrix(), null);
+        canvas.drawBitmap(resizedOverlay,new Matrix(), null);
         return overlay;
     }
+
+
 
     private int camRotation() {
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
